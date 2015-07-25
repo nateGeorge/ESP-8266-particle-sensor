@@ -1,5 +1,7 @@
-local PuKey = 'dZ6QRVwy4NHKrQd4zy90?private_key='
-local PrKey = 'eEKWGdxPg9cG2l7X1xqy&1um='
+file.open("keys")
+PuKey = file.readline()
+PrKey = file.readline()
+file.close()
 local sendURL = '/input/'..PuKey..PrKey
 local counter = 0
 local success = nil
