@@ -36,7 +36,10 @@ if (currentDust.P1~=nil) then
             sk:on("connection",function(conn) print("socket connected")
                 print("sending...")
         		-- change the name of 05umprticles and 1um_paricles here, or change the GET request for a different server if needed
-                conn:send("GET /input/"..PuKey.."?private_key="..PrKey.."&05um_particles="..currentDust.P2.."&1um_particles="..currentDust.P1)
+                -- is not working right now...don't know why, it works as a string but not when joined...
+                sendStr = "GET /input/"..PuKey.."?private_key="..PrKey.."&05um_particles="..currentDust.P2.."&1um_particles="..currentDust.P1
+                conn:send(sendStr)
+                print(sendStr)
                 conn:send(" HTTP/1.1\r\n") 
                 conn:send("Host: "..address)
                 conn:send("Connection: close\r\n")
