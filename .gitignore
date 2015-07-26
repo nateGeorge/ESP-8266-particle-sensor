@@ -52,3 +52,6 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# keys file, which has private and public keys for datastream
+keys
