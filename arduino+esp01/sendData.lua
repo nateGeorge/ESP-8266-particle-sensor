@@ -1,6 +1,8 @@
 file.open("keys")
-PuKey = file.readline()
-PrKey = file.readline()
+local line = file.readline()
+PuKey = string.sub(line,1,string.len(line)-1) --hack to remove CR/LF
+line = file.readline()
+PrKey = string.sub(line,1,string.len(line)-1)
 file.close()
 print(PuKey)
 print(PrKey)
