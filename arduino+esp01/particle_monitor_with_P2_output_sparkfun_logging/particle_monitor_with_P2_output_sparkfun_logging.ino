@@ -118,7 +118,7 @@ void loop() {
       }
       Serial.println(msg);
       msg = "";
-      wifiSerial.println("dofile('sendData.lc')");
+      wifiSerial.println("dofile('sendData.lua')");
       while (wifiSerial.available()){
         c = wifiSerial.read();
         msg += c;
