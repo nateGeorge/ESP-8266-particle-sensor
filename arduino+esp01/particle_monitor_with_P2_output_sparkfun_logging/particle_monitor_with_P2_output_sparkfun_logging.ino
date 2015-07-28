@@ -13,7 +13,7 @@
  Pin 1 (far right wire)  => Arduino GND
  Pin 2 (second from right) => Arduino Pin 9
  Pin 3 (middle)    => Arduino 5VDC
- Pin 4 (second from left) => Arduino Digital Pin 8
+ Pin 4 (second from left) => Arduino Digital Pin 8; I think P1 and P2 may be switched on DSM501A 
  Pin 5 (far left) => Arduino Pin 5
  make sure you have a PWM -> analog converted in between pin 5 and the sensor
  as shown here: http://provideyourown.com/2011/analogwrite-convert-pwm-to-voltage/
