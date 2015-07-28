@@ -70,7 +70,7 @@ float concentration = 0;
 char c;
 String msg = "";
 
-SoftwareSerial wifiSerial(2, 3); // RX, TX on wifi chip
+SoftwareSerial wifiSerial(2, 3); // connected to TX, RX on wifi chip
 
 void setup() {
   pinMode(setPin, OUTPUT);
