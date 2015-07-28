@@ -1,14 +1,33 @@
 /* Grove - Dust Sensor Demo v1.0
  Interface to Shinyei Model PPD42NS Particle Sensor
- Program by Christopher Nafis 
+ Original Program by Christopher Nafis 
  Written April 2012
+ Updated by Nathan George, 2015
  
  http://www.seeedstudio.com/depot/grove-dust-sensor-p-1050.html
  http://www.sca-shinyei.com/pdf/PPD42NS.pdf
+ http://www.samyoungsnc.com/products/3-1%20Specification%20DSM501.pdf
  
- JST Pin 1 (Black Wire)  => Arduino GND
- JST Pin 3 (Red wire)    => Arduino 5VDC
- JST Pin 4 (Yellow wire) => Arduino Digital Pin 8
+ This is using either the samyoung 501A or shinyei PPD42ns
+ perspective is looking down at the dust sensor
+ Pin 1 (far right wire)  => Arduino GND
+ Pin 2 (second from right) => Arduino Pin 9
+ Pin 3 (middle)    => Arduino 5VDC
+ Pin 4 (second from left) => Arduino Digital Pin 8
+ Pin 5 (far left) => Arduino Pin 5
+ make sure you have a PWM -> analog converted in between pin 5 and the sensor
+ as shown here: http://provideyourown.com/2011/analogwrite-convert-pwm-to-voltage/
+ using 22k resistor and 10uF capacitor works well
+ 
+ fan (using same PWM => analog conversion)
+ red => pin 6
+ black => GND
+ 
+ ESP8266 wifi chip
+ VCC and CHIP_PD => 3.3V vcc from voltage converter
+ GND => GND
+ RX => 2
+ TX => 3
  
 Dylos Air Quality Chart - Small Count Reading (0.5 micron)+
 
@@ -18,17 +37,28 @@ Dylos Air Quality Chart - Small Count Reading (0.5 micron)+
 150-300    = GOOD
 75-150     = VERY GOOD
 0-75       = EXCELLENT
+
+1 micron+
+
+1000 +     = VERY POOR
+350-1000   = POOR
+100-350    = FAIR
+50-100     = GOOD
+25-50      = VERY GOOD
+0-25       = EXCELLENT
  */
 #include<SoftwareSerial.h>
 
-int setPin = 3; // setting voltage for P2 detection threshhold, volatage = particle size in micron
+
 
 float threshDuty = 36; // roughly sets threshhold voltage for P2 to (26 (25.5 exactly) for 0.5V for detection of 0.5u particles)
 // on this particular one it seems like 70 lines up with P1 concentration of 1 micron, so assuming an offset of 0.37V for P2
 // so 0.5 micron should be a duty cycle of 44
 
-int P2pin = 8;
-int P1pin = 9;
+int setPin = 5; // setting voltage for P2 detection threshhold, volatage = particle size in micron
+int P1pin = 8;
+int P2pin = 9;
+int fanPin = 6; // for controlling power of fan
 int pin = P1pin;
 int i = 1; //counter for switching between P1 and P2
 unsigned long duration;
@@ -40,7 +70,7 @@ float concentration = 0;
 char c;
 String msg = "";
 
-SoftwareSerial wifiSerial(5, 6); // RX, TX
+SoftwareSerial wifiSerial(2, 3); // RX, TX on wifi chip
 
 void setup() {
   pinMode(setPin, OUTPUT);
