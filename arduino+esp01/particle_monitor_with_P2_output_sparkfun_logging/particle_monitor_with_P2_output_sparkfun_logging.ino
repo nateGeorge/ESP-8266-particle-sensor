@@ -51,9 +51,10 @@ Dylos Air Quality Chart - Small Count Reading (0.5 micron)+
 
 
 
-float threshDuty = 36; // roughly sets threshhold voltage for P2 to (26 (25.5 exactly) for 0.5V for detection of 0.5u particles)
-// on this particular one it seems like 70 lines up with P1 concentration of 1 micron, so assuming an offset of 0.37V for P2
+float threshDuty = 25; // roughly sets threshhold voltage for P2 to (26 (25.5 exactly) for 0.5V for detection of 0.5u particles)
+// on this particular shinyei one I have it seems like 70 lines up with P1 concentration of 1 micron, so assuming an offset of 0.37V for P2
 // so 0.5 micron should be a duty cycle of 44
+// on the dsm501A it seems different
 
 int setPin = 5; // setting voltage for P2 detection threshhold, volatage = particle size in micron
 int P1pin = 8;

@@ -1,0 +1,8 @@
+Used a 22k resistor and 10uF capacitor to convert PWM to analog, trying to set the P2 threshold on the DSM501A.  
+No success with it though, even with the duty cycle at 1/255, it was still reading well below the P1 value.
+On the shinyei sensor, it seemed to work better.
+
+The voltage difference across the P2 setpoint and GND is 1.8V by default on the DSM501A.  Putting a 27K (or 22k+4.7k)
+resistor from p2-ground changes the voltage difference to 0.8V, and the measurements seem in line with the P1 measurements 
+as they should be.  Putting a 10k resistor lowers the voltage to 0.45V, and the measurements are much higher than the P1
+value, along the lines I'd expect (about 4x the 1 micron numbers).
