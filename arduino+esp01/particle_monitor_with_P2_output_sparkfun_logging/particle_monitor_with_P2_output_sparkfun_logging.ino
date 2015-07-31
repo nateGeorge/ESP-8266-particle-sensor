@@ -93,7 +93,8 @@ void loop() {
    if ((millis()-starttime) > sampletime_ms)
   {
     ratio = lowpulseoccupancy/(sampletime_ms*10.0);  // Integer percentage 0=>100
-    concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve for 1 um particles
+    // concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve for 1 um particles, shinyei PPD42ns
+    concentration = 0.1187*ratio - 0.0865; // using spec sheet curve for DSM501A
     if (i == 1) {
       analogWrite(setPin, threshDuty); // turns on P2 detection pin, have to wait 51 should be 1 um for P2, this will set the input P2 voltage for particle detection size. with 22kOhm and 10uF PWM power converter, this should take about a second
       pin = P2pin;
