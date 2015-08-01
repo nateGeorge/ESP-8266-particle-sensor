@@ -12,9 +12,6 @@ dylosDataFile = 'dylos data.csv'
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
 
-print arduinoData.columns
-print dylosData.columns
-
 arduinoTime = [(parse(eachTime) - datetime(1970, 1, 1)).total_seconds() for eachTime in arduinoData['time (iso)']]
 dylosTime = [(parse(eachTime) - datetime(1970, 1, 1)).total_seconds() for eachTime in dylosData['time (iso)']]
 
@@ -30,10 +27,18 @@ for each in range(len(interpArduinoTime)):
     if dylosTime[each] == interpArduinoTime[each]:
         interpTimes.append(dylosTime[each])
         dylos1umData.append(dylosData['1um'][each])
-        arduino1umData.append(interpArduinoData[each])
+        arduino1umData.append(interpArduinoData[each]*2.5)
         arduinoP1ratio.append(interpArduinoRatio[each])
-print dylos1umData
-print arduino1umData
+rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),10)
+for each in range(len(rollingP1ratio)):
+    if np.isnan(rollingP1ratio[each]):
+        rollingP1ratio[each] = interpArduinoRatio[each]
+P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=2)
+P1corr = np.poly1d(P1fit)
+minRatio = min(rollingP1ratio)
+maxRatio = max(rollingP1ratio)
+fitLineX = np.linspace(minRatio, maxRatio, 10)
+fitLineY = P1corr(fitLineX)
 
 allData = {}
 allData['epoch time'] = interpTimes
@@ -44,11 +49,17 @@ allData = allData.set_index('epoch time')
 
 corrData = {}
 corrData['dylos 1um'] = dylos1umData
-corrData['P1 ratio'] = arduinoP1ratio
+corrData['P1 ratio'] = rollingP1ratio
 
 corrData = pd.DataFrame(corrData)
-corrData.plot(kind = 'scatter', x='P1 ratio', y='dylos 1um', c='white')
+ax = corrData.plot(kind = 'scatter', x='P1 ratio', y='dylos 1um', c='white')
+ax.plot(fitLineX, fitLineY)
 plt.show()
 
 allData.plot()
+plt.show()
+
+plt.scatter(allData.index, arduinoP1ratio, label='raw data')
+plt.plot(allData.index, rollingP1ratio, label='mva', c='w')
+plt.legend(loc='best')
 plt.show()
