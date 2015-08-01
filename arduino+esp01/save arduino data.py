@@ -18,7 +18,6 @@ with open(datafile,'a+') as csvfile:
             P1conc = re.search('P1: (\d+\.\d+)', line)
             P1ratio = re.search('P1 ratio: (\d+\.\d+)', line)
             P2conc = re.search('P2: (\d+\.\d+)', line)
-            print '1um: ', smallCount, '5um: ', largeCount
             measureTime = datetime.now().isoformat()
             if re.search('P2 ratio: (\d+\.\d+)', line) and P2ratio != None:
                 print 'P1, P2 ratios:', P1ratio, P2ratio
