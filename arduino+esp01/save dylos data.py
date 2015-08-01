@@ -1,7 +1,7 @@
 import serial, requests, re, csv, os
 from datetime import datetime
 
-ser = serial.Serial(8,timeout=10)
+ser = serial.Serial(8,timeout=3)
 
 datafile = 'dylos data.csv'
 
