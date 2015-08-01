@@ -93,12 +93,14 @@ void loop() {
    if ((millis()-starttime) > sampletime_ms)
   {
     ratio = lowpulseoccupancy/(sampletime_ms*10.0);  // Integer percentage 0=>100
-    // concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve for 1 um particles, shinyei PPD42ns
-    concentration = 0.1187*ratio - 0.0865; // using spec sheet curve for DSM501A
+    //concentration = 1.1*pow(ratio,3)-3.8*pow(ratio,2)+520*ratio+0.62; // using spec sheet curve for 1 um particles, shinyei PPD42ns
+    //concentration = 0.1187*ratio - 0.0865; // mg/m3 using spec sheet curve for DSM501A
+    concentration = 620.61*ratio/10; // particles/0.01ft3 for DSM501A, /10 to correlate with dylos sensor
     if (i == 1) {
       analogWrite(setPin, threshDuty); // turns on P2 detection pin, have to wait 51 should be 1 um for P2, this will set the input P2 voltage for particle detection size. with 22kOhm and 10uF PWM power converter, this should take about a second
       pin = P2pin;
       Serial.println("P1:" + String(concentration));
+      Serial.println("P1 ratio: " + String(ratio));
       wifiSerial.println("currentDust.P1=" + String(roundf(concentration)));
       delay(1100); // wait for the ESP8266 to catch up with input, and for P2 voltage threshold to plateau
       while (wifiSerial.available()){
@@ -112,6 +114,7 @@ void loop() {
       pin = P1pin;
       analogWrite(setPin, 0);
       Serial.println("P2:" + String(concentration));
+      Serial.println("P2 ratio: " + String(ratio));
       wifiSerial.println("currentDust.P2=" + String(roundf(concentration)));
       delay(500); // wait for esp8266 to process input, and make sure don't garble P2 with dofile('... below
       while (wifiSerial.available()){
