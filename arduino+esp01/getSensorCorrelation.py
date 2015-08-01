@@ -29,15 +29,15 @@ for each in range(len(interpArduinoTime)):
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
         arduinoP1ratio.append(interpArduinoRatio[each])
-rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),10)
+rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),20)
 for each in range(len(rollingP1ratio)):
     if np.isnan(rollingP1ratio[each]):
         rollingP1ratio[each] = interpArduinoRatio[each]
-P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=1)
+P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=3)
 P1corr = np.poly1d(P1fit)
 minRatio = min(rollingP1ratio)
 maxRatio = max(rollingP1ratio)
-fitLineX = np.linspace(minRatio, maxRatio, 10)
+fitLineX = np.linspace(minRatio, maxRatio, 1000)
 fitLineY = P1corr(fitLineX)
 print P1fit
 
@@ -57,7 +57,8 @@ ax = corrData.plot(kind = 'scatter', x='P1 ratio', y='dylos 1um', c='white')
 ax.plot(fitLineX, fitLineY)
 plt.show()
 
-allData.plot()
+ax = allData.plot()
+ax.plot(allData.index,pd.rolling_mean(allData['arduino data'],20), label = 'mva')
 plt.show()
 
 plt.scatter(allData.index, arduinoP1ratio, label='raw data')
