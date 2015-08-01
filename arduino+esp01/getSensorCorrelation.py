@@ -33,12 +33,13 @@ rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),10)
 for each in range(len(rollingP1ratio)):
     if np.isnan(rollingP1ratio[each]):
         rollingP1ratio[each] = interpArduinoRatio[each]
-P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=2)
+P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=1)
 P1corr = np.poly1d(P1fit)
 minRatio = min(rollingP1ratio)
 maxRatio = max(rollingP1ratio)
 fitLineX = np.linspace(minRatio, maxRatio, 10)
 fitLineY = P1corr(fitLineX)
+print P1fit
 
 allData = {}
 allData['epoch time'] = interpTimes
