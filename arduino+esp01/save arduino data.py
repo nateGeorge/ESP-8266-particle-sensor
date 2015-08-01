@@ -8,7 +8,7 @@ datafile = 'arduino data.csv'
 if not os.path.isfile(datafile):
     with open(datafile,'a+') as csvfile:
         arduinocsv = csv.writer(csvfile, delimiter = ',')
-        arduinocsv.writeline('1um', '5um', 'time (iso)')
+        arduinocsv.writeline('0.5um', '1um', 'time (iso)')
 
 with open(datafile,'a+') as csvfile:
     while True:
