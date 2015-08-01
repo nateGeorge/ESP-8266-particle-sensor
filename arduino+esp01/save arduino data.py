@@ -24,4 +24,4 @@ with open(datafile,'a+') as csvfile:
                 print 'P1, P2 ratios:', P1ratio, P2ratio
                 print 'P1, P2 concs:', P1conc, P2conc
                 P2ratio = re.search('P2 ratio: (\d+\.\d+)', line).group(1)
-                arduinocsv.writerow([smallCount, largeCount, measureTime])
+                arduinocsv.writerow([P2ratio, P1ratio, measureTime])
