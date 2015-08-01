@@ -4,7 +4,7 @@ from datetime import datetime
 ser = serial.Serial(1,timeout=4)
 
 datafile = 'arduino data.csv'
-P2ratio = None
+P1ratio = None
 if not os.path.isfile(datafile):
     with open(datafile,'a+') as csvfile:
         arduinocsv = csv.writer(csvfile, delimiter = ',')
@@ -23,8 +23,8 @@ with open(datafile,'a+') as csvfile:
             if re.search('.*P2: (\d+\.\d+).*', line):
                 P2conc = re.search('.*P2: (\d+\.\d+).*', line).group(1)
             measureTime = datetime.now().isoformat()
-            if re.search('.*P2 ratio: (\d+\.\d+).*', line) and P2ratio != None:
+            if re.search('.*P2 ratio: (\d+\.\d+).*', line) and P1ratio != None:
+                P2ratio = re.search('.*P2 ratio: (\d+\.\d+).*', line).group(1)
                 print '.*P1, P2 ratios:.*', P1ratio, P2ratio
                 print '.*P1, P2 concs:.*', P1conc, P2conc
-                P2ratio = re.search('.*P2 ratio: (\d+\.\d+).*', line).group(1)
                 arduinocsv.writerow([P2ratio, P1ratio, measureTime])
