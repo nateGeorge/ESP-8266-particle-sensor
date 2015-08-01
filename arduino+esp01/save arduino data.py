@@ -1,7 +1,7 @@
 import serial, requests, re, csv, os
 from datetime import datetime
 
-ser = serial.Serial(1,timeout=4)
+ser = serial.Serial(1,timeout=3)
 
 datafile = 'arduino data.csv'
 P1ratio = None
@@ -26,4 +26,4 @@ while True:
             print 'P1, P2 concs:', P1conc, P2conc
             with open(datafile,'ab+') as csvfile:
                 arduinocsv = csv.writer(csvfile, delimiter = ',')
-                arduinocsv.writerow([P2ratio, P1ratio, P1conc, P2conc, measureTime])
+                arduinocsv.writerow([P2ratio, P1ratio, P2conc, P1conc, measureTime])
