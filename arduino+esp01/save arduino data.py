@@ -25,6 +25,6 @@ with open(datafile,'a+') as csvfile:
             measureTime = datetime.now().isoformat()
             if re.search('.*P2 ratio: (\d+\.\d+).*', line) and P1ratio != None:
                 P2ratio = re.search('.*P2 ratio: (\d+\.\d+).*', line).group(1)
-                print '.*P1, P2 ratios:.*', P1ratio, P2ratio
-                print '.*P1, P2 concs:.*', P1conc, P2conc
+                print 'P1, P2 ratios:', P1ratio, P2ratio
+                print 'P1, P2 concs:', P1conc, P2conc
                 arduinocsv.writerow([P2ratio, P1ratio, measureTime])
