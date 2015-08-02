@@ -21,9 +21,6 @@ def func(x, a, b, c):
     
 def expfunc(x, a, b):
     return np.exp(a*x)*b
-    
-def linearfunc(x, a):
-    return a*x
 
 plt.style.use('dark_background')
 
@@ -45,34 +42,30 @@ dylos1umData = []
 arduino1umData = []
 arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
-    if dylosTime[each] == interpArduinoTime[each] and dylosData['1um'][each]<1000 and interpArduinoRatio[each] < 4:
+    if dylosTime[each] == interpArduinoTime[each]:
         interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
-        arduinoP1ratio.append(interpArduinoRatio[each])
+        arduinoP1ratio.append(interpArduinoRatio[each + mvaperiod/2])
 rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),20)
 for each in range(len(rollingP1ratio)):
     if np.isnan(rollingP1ratio[each]):
-        rollingP1ratio[each] = arduinoP1ratio[each]
+        rollingP1ratio[each] = interpArduinoRatio[each]
 P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=4)
 P1corr = np.poly1d(P1fit)
 minRatio = min(rollingP1ratio)
 maxRatio = max(rollingP1ratio)
 fitLineX = np.linspace(minRatio, maxRatio, 1000)
 fitLineY = P1corr(fitLineX)
-print '4th order:',P1fit
+print P1fit
 
 popt, pcov = cf(func, rollingP1ratio, dylos1umData)
-print '3rd order 0-intercept:',popt
+print popt
 fitLineY2 = func(fitLineX, popt[0], popt[1], popt[2])
 
 popt3, pcov3 = cf(expfunc, rollingP1ratio, dylos1umData)
-print 'exponential:',popt3
+print popt3
 fitLineY3 = expfunc(fitLineX, popt3[0], popt3[1])
-
-linearpopt, linearpcov = cf(linearfunc, rollingP1ratio, dylos1umData)
-print 'linear:',linearpopt
-fitLineYlinear = linearfunc(fitLineX, linearpopt[0])
 
 allData = {}
 allData['time'] = interpTimes
@@ -87,10 +80,9 @@ corrData['P1 ratio'] = rollingP1ratio
 
 corrData = pd.DataFrame(corrData)
 ax = corrData.plot(kind = 'scatter', x='P1 ratio', y='dylos 1um', c='white')
-ax.plot(fitLineX, fitLineY, linewidth=3, label='4th degree')
+ax.plot(fitLineX, fitLineY, linewidth=3, label='linear')
 ax.plot(fitLineX, fitLineY2, linewidth=3, label='3rd order, intercept=0')
 ax.plot(fitLineX, fitLineY3, linewidth=3, label='exponential')
-ax.plot(fitLineX, fitLineYlinear, linewidth=3, label='linear')
 ax.legend(loc='best')
 plt.show()
 
