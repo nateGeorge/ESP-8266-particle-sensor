@@ -59,7 +59,7 @@ float threshDuty = 25; // roughly sets threshhold voltage for P2 to (26 (25.5 ex
 int setPin = 5; // setting voltage for P2 detection threshhold, volatage = particle size in micron
 int P1pin = 8;
 int P2pin = 9;
-int fanPin = 6; // for controlling power of fan
+int fanPin = 12; // for controlling power of fan
 int pin = P1pin;
 int i = 1; //counter for switching between P1 and P2
 unsigned long duration;
@@ -75,6 +75,8 @@ SoftwareSerial wifiSerial(2, 3); // connected to TX, RX on wifi chip
 
 void setup() {
   pinMode(setPin, OUTPUT);
+  pinMode(fanPin, OUTPUT);
+  digitalWrite(fanPin, HIGH);
   // analogWrite(setPin, threshDuty); // 51 should be 1 um for P2, this will set the input P2 voltage for particle detection size
   Serial.begin(9600);
   wifiSerial.begin(9600);
