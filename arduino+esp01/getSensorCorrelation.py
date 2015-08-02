@@ -4,6 +4,11 @@ from datetime import datetime
 from dateutil.parser import parse
 from scipy import interp
 import pylab as plt
+from scipy.optimize import curve_fit as cf
+
+def func(x, a, b, c):
+    return np.power(x,3)*a + np.power(x,2)*b + x*c
+
 plt.style.use('dark_background')
 
 arduinoDataFile = 'arduino data.csv'
@@ -33,13 +38,18 @@ rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),20)
 for each in range(len(rollingP1ratio)):
     if np.isnan(rollingP1ratio[each]):
         rollingP1ratio[each] = interpArduinoRatio[each]
-P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=3)
+P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=1)
 P1corr = np.poly1d(P1fit)
 minRatio = min(rollingP1ratio)
 maxRatio = max(rollingP1ratio)
 fitLineX = np.linspace(minRatio, maxRatio, 1000)
 fitLineY = P1corr(fitLineX)
 print P1fit
+
+popt, pcov = cf(func, rollingP1ratio, dylos1umData)
+print popt
+fitLineX2 = np.linspace(minRatio, maxRatio, 1000)
+fitLineY2 = func(fitLineX, popt[0], popt[1], popt[2])
 
 allData = {}
 allData['epoch time'] = interpTimes
@@ -54,14 +64,15 @@ corrData['P1 ratio'] = rollingP1ratio
 
 corrData = pd.DataFrame(corrData)
 ax = corrData.plot(kind = 'scatter', x='P1 ratio', y='dylos 1um', c='white')
-ax.plot(fitLineX, fitLineY)
+ax.plot(fitLineX, fitLineY, linewidth=3)
+ax.plot(fitLineX2, fitLineY2, linewidth=3)
 plt.show()
 
 ax = allData.plot()
-ax.plot(allData.index,pd.rolling_mean(allData['arduino data'],20), label = 'mva')
+ax.plot(allData.index,pd.rolling_mean(allData['arduino data'],20), label='mva', color='orange', linewidth=3)
 plt.show()
 
 plt.scatter(allData.index, arduinoP1ratio, label='raw data')
-plt.plot(allData.index, rollingP1ratio, label='mva', c='w')
+plt.plot(allData.index, rollingP1ratio, label='mva', c='orange', linewidth=3)
 plt.legend(loc='best')
 plt.show()
