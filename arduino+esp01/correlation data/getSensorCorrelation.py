@@ -13,8 +13,8 @@ from_zone = tz.tzutc()
 
 mvaperiod = 20
 
-timeCutoff = datetime(2015,8,1,14)
-timeCutoff = (timeCutoff - datetime(1970,1,1)).total_seconds()
+#timeCutoff = datetime(2015,8,1,14)
+#timeCutoff = (timeCutoff - datetime(1970,1,1)).total_seconds()
 
 def func(x, a, b, c):
     return np.power(x,3)*a + np.power(x,2)*b + x*c
@@ -24,8 +24,8 @@ def expfunc(x, a, b):
 
 plt.style.use('dark_background')
 
-arduinoDataFile = 'arduino data.csv'
-dylosDataFile = 'dylos data.csv'
+arduinoDataFile = '2015-08-02 09-18-19 arduino data.csv'
+dylosDataFile = '2015-08-02 09-17-57 dylos data.csv'
 
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
@@ -42,7 +42,7 @@ dylos1umData = []
 arduino1umData = []
 arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
-    if dylosTime[each] == interpArduinoTime[each] and dylosTime[each] > timeCutoff:
+    if dylosTime[each] == interpArduinoTime[each]:
         interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
