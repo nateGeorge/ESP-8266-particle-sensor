@@ -45,15 +45,16 @@ dylos1umData = []
 arduino1umData = []
 arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
-    if dylosTime[each] == interpArduinoTime[each] and dylosData['1um'][each]<1000 and interpArduinoRatio[each] < 4:
+    if dylosTime[each] == interpArduinoTime[each] and dylosData['1um'][each]<1000 and interpArduinoRatio[each + mvaperiod/2]<2.4 and not (interpArduinoRatio[each + mvaperiod/2]<1.7 and dylosData['1um'][each]>600) and (dylosData['1um'][each] / interpArduinoRatio[each + mvaperiod/2])<330:
         interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
-        arduinoP1ratio.append(interpArduinoRatio[each])
+        arduinoP1ratio.append(interpArduinoRatio[each + mvaperiod/2])
 rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),20)
 for each in range(len(rollingP1ratio)):
     if np.isnan(rollingP1ratio[each]):
         rollingP1ratio[each] = arduinoP1ratio[each]
+        print arduinoP1ratio[each]
 P1fit = np.polyfit(rollingP1ratio, dylos1umData, deg=4)
 P1corr = np.poly1d(P1fit)
 minRatio = min(rollingP1ratio)
