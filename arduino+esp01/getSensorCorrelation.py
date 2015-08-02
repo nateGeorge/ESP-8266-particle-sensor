@@ -6,14 +6,15 @@ from dateutil.parser import parse
 from scipy import interp
 from scipy.optimize import curve_fit as cf
 from dateutil import tz
+from datetime import timedelta
 
 to_zone = tz.tzlocal()
 from_zone = tz.tzutc()
 
 mvaperiod = 20
 
-morningCutoff = datetime(2015,8,1,7)
-morningCutoff = (morningCutoff - datetime(1970,1,1)).total_seconds()
+timeCutoff = datetime(2015,8,1,14)
+timeCutoff = (timeCutoff - datetime(1970,1,1)).total_seconds()
 
 def func(x, a, b, c):
     return np.power(x,3)*a + np.power(x,2)*b + x*c
@@ -41,10 +42,8 @@ dylos1umData = []
 arduino1umData = []
 arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
-    if dylosTime[each] == interpArduinoTime[each] and dylosTime[each] > morningCutoff:
-        utc = datetime.fromtimestamp(dylosTime[each])
-        utc = utc.replace(tzinfo=from_zone)
-        interpTimes.append(utc)
+    if dylosTime[each] == interpArduinoTime[each] and dylosTime[each] > timeCutoff:
+        interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
         arduinoP1ratio.append(interpArduinoRatio[each + mvaperiod/2])
@@ -69,11 +68,11 @@ print popt3
 fitLineY3 = expfunc(fitLineX, popt3[0], popt3[1])
 
 allData = {}
-allData['epoch time'] = interpTimes
+allData['time'] = interpTimes
 allData['dylos data'] = dylos1umData
 allData['arduino data'] = arduino1umData
 allData = pd.DataFrame(allData)
-allData = allData.set_index('epoch time')
+allData = allData.set_index('time')
 
 corrData = {}
 corrData['dylos 1um'] = dylos1umData
