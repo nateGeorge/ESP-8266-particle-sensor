@@ -27,8 +27,8 @@ def linearfunc(x, a):
 
 plt.style.use('dark_background')
 
-arduinoDataFile = '2015-08-02 09-18-19 arduino data.csv'
-dylosDataFile = '2015-08-02 09-17-57 dylos data.csv'
+arduinoDataFile = '2015-08-03 20-15-00 arduino data.csv'
+dylosDataFile = '2015-08-03 20-14-57 dylos data.csv'
 
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
