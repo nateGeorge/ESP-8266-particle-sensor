@@ -30,6 +30,12 @@ plt.style.use('dark_background')
 arduinoDataFile = '2015-08-06 21-14-21 arduino data.csv'
 dylosDataFile = '2015-08-06 21-15-04 dylos data.csv'
 
+
+timeMin = datetime(2015,8,6,23)
+timeMin = (timeMin - datetime(1970,1,1)).total_seconds()
+timeMax = datetime(2015,8,7,1)
+timeMax = (timeMax - datetime(1970,1,1)).total_seconds()
+
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
 
@@ -45,7 +51,8 @@ dylos1umData = []
 arduino1umData = []
 arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
-    if dylosTime[each] == interpArduinoTime[each] and dylosData['1um'][each]<1000 and interpArduinoRatio[each] < 4:
+    print dylosTime[each], timeMax
+    if dylosTime[each] == interpArduinoTime[each] and dylosTime[each] > timeMin and dylosTime[each] < timeMax:
         interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
