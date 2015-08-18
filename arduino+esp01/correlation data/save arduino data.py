@@ -3,7 +3,7 @@ from datetime import datetime
 
 ser = serial.Serial(1,timeout=3)
 
-datafile = datetime.strftime(datetime.now(),'%Y-%m-%d %H-%M-%S') + ' arduino data.csv'
+datafile = 'correlation data/' + datetime.strftime(datetime.now(),'%Y-%m-%d %H-%M-%S') + ' arduino data.csv'
 P1ratio = None
 if not os.path.isfile(datafile):
     with open(datafile,'wb') as csvfile:

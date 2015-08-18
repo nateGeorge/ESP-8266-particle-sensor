@@ -1,3 +1,4 @@
+import os, re, time
 import pandas as pd
 import numpy as np
 import pylab as plt
@@ -27,14 +28,26 @@ def linearfunc(x, a):
 
 plt.style.use('dark_background')
 
-arduinoDataFile = '2015-08-06 21-14-21 arduino data.csv'
-dylosDataFile = '2015-08-06 21-15-04 dylos data.csv'
+# data from room in 93 ridgeview
+#arduinoDataFile = '2015-08-06 21-14-21 arduino data.csv'
+#dylosDataFile = '2015-08-06 21-15-04 dylos data.csv'
 
+# factor e farm
+'''
+day = 17
+corrFiles = os.listdir('correlation data')
+arduinoFiles = []
+dylosFiles = []
+for file in corrFiles:
+    if os.path.isfile():
+        if re.search('2015-08-' + day, file):
+            if re.search('arduino', file):
+                arduinoFiles.append(file)
+            if re.search('dylos', file):
+                dylosFiles.append(file)'''
 
-timeMin = datetime(2015,8,6,23)
-timeMin = (timeMin - datetime(1970,1,1)).total_seconds()
-timeMax = datetime(2015,8,7,1)
-timeMax = (timeMax - datetime(1970,1,1)).total_seconds()
+arduinoDataFile = 'correlation data/2015-08-17 18-20-12 arduino data.csv'
+dylosDataFile = 'correlation data/2015-08-17 18-20-06 dylos data.csv'
 
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
@@ -45,19 +58,25 @@ dylosTime = [(parse(eachTime) - datetime(1970, 1, 1)).total_seconds() for eachTi
 interpArduinoTime = interp(dylosTime, arduinoTime, arduinoTime)#arduinoData['1um'])
 interpArduinoData = interp(dylosTime, arduinoTime, arduinoData['1um'])
 interpArduinoRatio = interp(dylosTime, arduinoTime, arduinoData['P1 ratio'])
+rollingArduinoData = pd.rolling_mean(np.array(interpArduinoData), 20)
+rollingArduinoRatio = pd.rolling_mean(np.array(interpArduinoRatio), 20)
+
+frames = [dylosData, pd.DataFrame(data=interpArduinoData, columns=['1um arduino']), pd.DataFrame(data=interpArduinoRatio, columns=['arduino P1 ratio'])]
+result = pd.concat(frames,axis=1)
+result.to_csv(path_or_buf='concatd data.csv', index=False)
 
 interpTimes = []
 dylos1umData = []
 arduino1umData = []
 arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
-    print dylosTime[each], timeMax
-    if dylosTime[each] == interpArduinoTime[each] and dylosTime[each] > timeMin and dylosTime[each] < timeMax:
+    #print dylosTime[each], timeMax
+    if dylosTime[each] == interpArduinoTime[each]:# and dylosTime[each] > timeMin and dylosTime[each] < timeMax:
         interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
         arduinoP1ratio.append(interpArduinoRatio[each])
-rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio),20)
+rollingP1ratio = pd.rolling_mean(np.array(arduinoP1ratio), 20)
 for each in range(len(rollingP1ratio)):
     if np.isnan(rollingP1ratio[each]):
         rollingP1ratio[each] = arduinoP1ratio[each]
@@ -67,10 +86,10 @@ minRatio = min(rollingP1ratio)
 maxRatio = max(rollingP1ratio)
 fitLineX = np.linspace(minRatio, maxRatio, 1000)
 fitLineY = P1corr(fitLineX)
-print '4th order:',P1fit
+print '4th order:', P1fit
 
 popt, pcov = cf(func, rollingP1ratio, dylos1umData)
-print '3rd order 0-intercept:',popt
+print '3rd order 0-intercept:', popt
 fitLineY2 = func(fitLineX, popt[0], popt[1], popt[2])
 
 popt3, pcov3 = cf(expfunc, rollingP1ratio, dylos1umData)

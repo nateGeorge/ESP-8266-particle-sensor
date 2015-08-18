@@ -3,7 +3,7 @@ from datetime import datetime
 
 ser = serial.Serial(8,timeout=3)
 
-datafile = datetime.strftime(datetime.now(),'%Y-%m-%d %H-%M-%S') + ' dylos data.csv'
+datafile = 'correlation data/' + datetime.strftime(datetime.now(),'%Y-%m-%d %H-%M-%S') + ' dylos data.csv'
 if not os.path.isfile(datafile):
     with open(datafile,'wb') as csvfile:
         dyloscsv = csv.writer(csvfile, delimiter = ',')
