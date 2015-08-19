@@ -6,11 +6,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from scipy import interp
 from scipy.optimize import curve_fit as cf
-from dateutil import tz
 from datetime import timedelta
-
-to_zone = tz.tzlocal()
-from_zone = tz.tzutc()
 
 mvaperiod = 20
 
@@ -46,8 +42,8 @@ for file in corrFiles:
             if re.search('dylos', file):
                 dylosFiles.append(file)'''
 
-arduinoDataFile = 'correlation data/2015-08-17 18-20-12 arduino data.csv'
-dylosDataFile = 'correlation data/2015-08-17 18-20-06 dylos data.csv'
+arduinoDataFile = 'correlation data/2015-08-18 10-16-48 arduino data.csv'
+dylosDataFile = 'correlation data/2015-08-18 10-16-46 dylos data.csv'
 
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
@@ -72,7 +68,9 @@ arduinoP1ratio = []
 for each in range(len(interpArduinoTime) - mvaperiod):
     #print dylosTime[each], timeMax
     if dylosTime[each] == interpArduinoTime[each]:# and dylosTime[each] > timeMin and dylosTime[each] < timeMax:
-        interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=5))
+        interpTimes.append(datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=-4)) # -6 for west coast time, -4 for central
+        datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=-4)
+        print datetime.fromtimestamp(dylosTime[each]) - timedelta(hours=-4)
         dylos1umData.append(dylosData['1um'][each])
         arduino1umData.append(interpArduinoData[each]*2.5)
         arduinoP1ratio.append(interpArduinoRatio[each])
