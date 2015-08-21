@@ -29,7 +29,9 @@ plt.style.use('dark_background')
 #dylosDataFile = '2015-08-06 21-15-04 dylos data.csv'
 
 # factor e farm
-'''
+
+firstArduinoFile = False
+firstdylosFile = False
 day = 17
 corrFiles = os.listdir('correlation data')
 arduinoFiles = []
@@ -40,7 +42,7 @@ for file in corrFiles:
             if re.search('arduino', file):
                 arduinoFiles.append(file)
             if re.search('dylos', file):
-                dylosFiles.append(file)'''
+                dylosFiles.append(file)
 
 arduinoDataFile = 'correlation data/2015-08-18 10-16-48 arduino data.csv'
 dylosDataFile = 'correlation data/2015-08-18 10-16-46 dylos data.csv'
