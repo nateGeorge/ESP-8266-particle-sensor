@@ -8,6 +8,8 @@ from scipy import interp
 from scipy.optimize import curve_fit as cf
 from datetime import timedelta
 
+plt.rcParams['savefig.facecolor'] = 'b'
+
 mvaperiod = 20
 
 #timeCutoff = datetime(2015,8,1,14)
@@ -28,8 +30,8 @@ plt.style.use('dark_background')
 #arduinoDataFile = '2015-08-06 21-14-21 arduino data.csv'
 #dylosDataFile = '2015-08-06 21-15-04 dylos data.csv'
 
-# factor e farm
-
+# for loading multiple files and joining them
+'''
 firstArduinoFile = False
 firstdylosFile = False
 day = 17
@@ -37,15 +39,23 @@ corrFiles = os.listdir('correlation data')
 arduinoFiles = []
 dylosFiles = []
 for file in corrFiles:
-    if os.path.isfile():
-        if re.search('2015-08-' + day, file):
+    print os.path.isfile(os.getcwd() + '\\correlation data\\' + file)
+    if os.path.isfile(os.getcwd() + '\\correlation data\\' + file):
+        print file
+        if re.search('2015-08-' + str(day), file):
+            print file
             if re.search('arduino', file):
-                arduinoFiles.append(file)
+                arduinoFiles.append(pd.read_csv(os.getcwd() + '\\correlation data\\' + file))
             if re.search('dylos', file):
-                dylosFiles.append(file)
+                dylosFiles.append(pd.read_csv(os.getcwd() + '\\correlation data\\' + file))
+                
+arduinoData = pd.concat(arduinoFiles)
+dylosData = pd.concat(dylosFiles)
+'''
 
-arduinoDataFile = 'correlation data/2015-08-18 10-16-48 arduino data.csv'
-dylosDataFile = 'correlation data/2015-08-18 10-16-46 dylos data.csv'
+# for loading 2 single files
+arduinoDataFile = 'correlation data/2015-08-19 08-27-09 arduino data.csv'
+dylosDataFile = 'correlation data/2015-08-19 08-27-15 dylos data.csv'
 
 arduinoData = pd.read_csv(arduinoDataFile)
 dylosData = pd.read_csv(dylosDataFile)
@@ -59,9 +69,10 @@ interpArduinoRatio = interp(dylosTime, arduinoTime, arduinoData['P1 ratio'])
 rollingArduinoData = pd.rolling_mean(np.array(interpArduinoData), 20)
 rollingArduinoRatio = pd.rolling_mean(np.array(interpArduinoRatio), 20)
 
+'''
 frames = [dylosData, pd.DataFrame(data=interpArduinoData, columns=['1um arduino']), pd.DataFrame(data=interpArduinoRatio, columns=['arduino P1 ratio'])]
-result = pd.concat(frames,axis=1)
-result.to_csv(path_or_buf='concatd data.csv', index=False)
+result = pd.concat(frames, axis=1)
+result.to_csv(path_or_buf='concatd data - 2015-08-' + str(day) + '.csv', index=False)'''
 
 interpTimes = []
 dylos1umData = []

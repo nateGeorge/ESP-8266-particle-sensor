@@ -1,7 +1,5 @@
 wifi.setmode(1)
 
-dofile('getAPlist.lc')
-
 tmr.alarm(1,5000,1,function ()
     local wifiStat = wifi.sta.status()
     print(wifiStat)
@@ -16,8 +14,11 @@ tmr.alarm(1,5000,1,function ()
         dofile('monitor dust concentration.lc')
         return
     end
-    if (wifiStat ~=5 and wifiStat ~=1 and file.open('networks')) then
-        file.close('networks')
+    if (wifiStat ~=5 and wifiStat ~=1) then
+        if file.open('networks') then
+            file.close('networks')
+        end
+        dofile('getAPlist.lc')
         dofile('tryConnect.lc')
         wifi.sleeptype(1)
     end
