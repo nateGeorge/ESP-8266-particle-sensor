@@ -1,3 +1,7 @@
+i2c.setup(0, 3, 4, i2c.SLOW)
+lcd = dofile("lcd1602.lua")()
+lcd.put(lcd.locate(0, 0), "Starting up...")
+
 P1pin = 7
 P2pin = 6
 P2setPin = 8
@@ -22,7 +26,9 @@ function measureDust()
   if readPin == P1pin then
     concentration = 1.1*math.pow(ratio,3)-3.8*math.pow(ratio,2)+520*ratio+0.62
     print('P1 concentration: '..concentration)
-    readPin = P2pin
+    lcd.put(lcd.locate(0, 0), "Concentration:")
+    lcd.put(lcd.locate(1, 0), string(math.floor(concentration+0.5)))
+    --readPin = P2pin
     pulse1 = tmr.now()
     du = 0
     gpio.trig(readPin, "down", pin1cb)
@@ -48,7 +54,6 @@ function pin1cb(level)
   end
 end
 
-setP2thresh(0.5)
 readPin = P1pin
 gpio.trig(readPin, "down", pin1cb)
 
