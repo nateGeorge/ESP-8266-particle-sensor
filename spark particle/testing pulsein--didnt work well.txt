@@ -1,0 +1,199 @@
+/*
+SDA => D0
+SCK => D1
+https://community.particle.io/t/i2c-with-adafruit-lcd-display-for-pi/13876/3
+*/
+//SYSTEM_MODE(SEMI_AUTOMATIC); // control connection and processing manually
+
+
+#include "LiquidCrystal_I2C_Spark/LiquidCrystal_I2C_Spark.h"
+#include "ShinyeiPPD42NS.h"
+#include "function_pulseIn.h"
+#include "function_judgeAir.h"
+
+// --------------------------------------------------------------------- Shinyei PPD42NS
+#define DUST_SAMPLE_INTERVAL_MS 5000
+ShinyeiPPD42NS dust(DUST_SAMPLE_INTERVAL_MS);
+#define P1DUST_PIN                D2
+float averagePeriod = 18; // number of readings to use as a moving exponential average
+float alpha = 2/(averagePeriod + 1); // convention for EMA weighting
+bool firstTime = true;
+bool firstThru = false;
+unsigned long start_ms;
+String theJudgement;
+float P1average;
+unsigned int pulseStart;
+unsigned int starting_ms;
+unsigned int duration;
+uint32_t pulseLowMeas = 0;
+
+struct reading_struct {
+    int    reading_time = 0;    
+    double temperature = 0;
+    double humidity = 0;
+    int    wsp2110_hcho = 0;    
+    int    tgs2602_sewer = 0; 
+    float  dust_concentration = 0;    
+};
+
+reading_struct reading;
+
+LiquidCrystal_I2C *lcd;
+
+int lastSecond = 0;
+
+// turn LCD backlight on or off
+bool BLon = true;
+unsigned int pressTime = Time.now();
+
+void setup(void)
+{
+    attachInterrupt(D4, lcdBL, RISING); // turn LCD backlight on or off
+    lcd = new LiquidCrystal_I2C(0x27, 16, 2);
+    lcd->init();
+    lcd->backlight();
+    lcd->clear();
+    pinMode(P1DUST_PIN, INPUT);
+    lcd->print("starting up...");
+    start_ms = millis();
+    attachInterrupt(P1DUST_PIN, pulseLow, FALLING);
+}
+
+void loop(void)
+{
+    unsigned long current_ms = millis();
+    if (firstTime){
+        //dust.startSampling(current_ms);
+        starting_ms = current_ms;
+        firstTime = false;
+        duration = 0;
+    }
+    /*if(!dust.isSamplingComplete()) {
+        if (not firstThru){
+            displayProgressBar();
+        } 
+        unsigned long duration = pulseIn(P1DUST_PIN, LOW);
+        reading.dust_concentration = dust.getConcentration(duration, current_ms);
+    }
+    if(dust.isSamplingComplete()){
+        if (!firstThru) {
+            P1average = reading.dust_concentration;
+            firstThru = true;
+        }
+        else {
+            P1average = reading.dust_concentration*alpha + P1average*(1-alpha);
+        }
+        theJudgement = judgeAir(P1average);
+        lcd->clear();
+        lcd->setCursor(0,0);
+        lcd->print(theJudgement);
+        lcd->setCursor(0,1);
+        lcd->print(int(P1average));
+        firstTime = true;
+        connect();
+    }*/
+    if (pulseLowMeas) {
+        if (pulseLowMeas != 1) {
+            Serial.print("Pulse low measured: ");
+            Serial.println(pulseLowMeas);
+            lcd->setCursor(0,0);
+            lcd->print("pulse low:");
+            lcd->setCursor(0,1);
+            lcd->print(pulseLowMeas);
+            duration = duration + pulseLowMeas;
+        }
+        pulseLowMeas = 0;
+        attachInterrupt(P1DUST_PIN, pulseLow, FALLING);
+    }
+    if (current_ms - starting_ms > DUST_SAMPLE_INTERVAL_MS) {
+        if (!firstThru) {
+            P1average = calculateConcentration();
+            firstThru = true;
+        }
+        else {
+            P1average = calculateConcentration()*alpha + P1average*(1-alpha);
+        }
+        theJudgement = judgeAir(P1average);
+        lcd->clear();
+        lcd->setCursor(0,0);
+        lcd->print(theJudgement);
+        lcd->setCursor(0,1);
+        lcd->print(int(P1average));
+        firstTime = true;
+        connect();
+    }
+    
+}
+
+void displayProgressBar() {
+    lcd->setCursor(0,1);
+    lcd->print("please wait 5s..");
+}
+
+void lcdBL() {
+    if (Time.now()-pressTime<1) return; // make sure it's been a few seconds before letting it switch again
+    if (BLon) {
+        lcd->noBacklight();
+    }
+    else{
+        lcd->backlight();
+    }
+    BLon = !BLon;
+    pressTime = Time.now();
+}
+
+void connect() {
+  if (Spark.connected() == false) {
+    Spark.connect();
+  }
+}
+
+void pulse1Low() {
+    pulseStart = millis();
+    detachInterrupt(P1DUST_PIN);
+    attachInterrupt(P1DUST_PIN, pulseLowDone, RISING);
+}
+
+void pulseLowDone() {
+    duration = millis() - pulseStart;
+    detachInterrupt(P1DUST_PIN);
+    attachInterrupt(P1DUST_PIN, pulseLow, FALLING);
+}
+
+float calculateConcentration() {
+    float ratio = duration / (DUST_SAMPLE_INTERVAL_MS * 10);
+    float concentration = 1.1 * pow(ratio,3) - 3.8 * pow(ratio,2) + 520 * ratio; // using spec sheet curve
+    return concentration;
+}
+
+void pulseLow() {
+    #define TICKS_PER_1000US 6250.0
+    #define PULSE_INVALID 999999999
+    uint16_t pin = P1DUST_PIN;
+    detachInterrupt(pin);
+    STM32_Pin_Info* PIN_MAP2 = HAL_Pin_Map(); // Pointer required for highest access speed
+    GPIO_TypeDef* portMask = (PIN_MAP2[pin].gpio_peripheral);
+    uint16_t pinMask = (PIN_MAP2[pin].gpio_pin);
+    uint32_t pulseCount = 0;
+    uint32_t loopMax = TICKS_PER_1000US * 1000 * 10; // 10 seconds timeout to maintain the Particle Cloud connection.
+    
+    // Throw away the first LOW pulse, because there seems to be some false
+    // triggering immediately after attaching a FALLING interrupt.
+    // NOTE: This is fine for fast reocurring waveforms, but not ones that
+    // are far and few between.
+    //while (GPIO_ReadInputDataBit(portMask, pinMask) == LOW);
+    
+    // Wait for 2nd FALLING edge
+    //while (GPIO_ReadInputDataBit(portMask, pinMask) == HIGH);
+    
+    while (GPIO_ReadInputDataBit(portMask, pinMask) == LOW) {
+        if (pulseCount++ == loopMax) {
+            pulseLowMeas = PULSE_INVALID;
+            return;
+        }
+    }
+    
+    // pulseCount is TICKS_PER_1000US with a 1000us calibration pulse.
+    // Add 1 as a minimum to let the application know this function was called.
+    pulseLowMeas = (pulseCount * (double)(1000.0 / TICKS_PER_1000US)) + 1;
+}
