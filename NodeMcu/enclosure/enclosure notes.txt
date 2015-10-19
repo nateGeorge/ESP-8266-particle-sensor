@@ -1,0 +1,4 @@
+4"x3"x2.5" for box frame size (outer dimensions)
+101.6x88.9x63.5mm
+bamboo is 2.7mm thick
+dimensions of LCD screen are about 71mmx24mm
