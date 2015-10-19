@@ -14,6 +14,7 @@ end
 -- being connected to a wifi network severely effects the measurement,
 -- making the concentration reading much higher
 wifi.sta.disconnect()
+tmr.delay(1000) -- first second or so usually gives a very high number
 
 -- load EMA periods
 dofile('EMAsetup.lua')
@@ -22,7 +23,7 @@ dofile('AQregimes.lua')
 useRegime = 1
 
 -- LCD settings
-i2c.setup(0, 3, 4, i2c.SLOW)
+i2c.setup(0, 3, 4, i2c.SLOW) -- SDA, SCL 3, 4
 lcd = dofile("lcd1602.lua")()
 lcd.put(lcd.locate(0, 0), "Starting up...")
 
