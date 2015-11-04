@@ -22,7 +22,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -42,7 +42,7 @@
      id="namedview52"
      showgrid="false"
      inkscape:zoom="0.58989899"
-     inkscape:cx="567.47975"
+     inkscape:cx="629.48021"
      inkscape:cy="312.47008"
      inkscape:window-x="75"
      inkscape:window-y="34"
@@ -79,7 +79,8 @@
            sodipodi:role="line"
            id="tspan3035"
            x="3558.5176"
-           y="8201.8154">Pura Vida</tspan></text>
+           y="8201.8154"
+           style="font-size:364.08896311px">Pura Vida</tspan></text>
       <text
          xml:space="preserve"
          style="font-size:1820.44482422px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans;-inkscape-font-specification:Sans Italic"
@@ -91,7 +92,7 @@
            id="tspan3039"
            x="3449.4099"
            y="9401.999"
-           style="font-size:1137.7779541px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans Italic">Particulate Monitor v1.0</tspan></text>
+           style="font-size:364.08896311px;font-style:italic;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sans;-inkscape-font-specification:Sans Italic">Particulate Monitor v1.0</tspan></text>
     </g>
     <rect
        x="535.06299"
